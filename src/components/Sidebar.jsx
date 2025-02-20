@@ -1,59 +1,101 @@
-import { LuBox, LuUser, LuMessageSquare, LuCalendar } from "react-icons/lu"
-import { FaSuitcase } from 'react-icons/fa'
-import { TbUser } from 'react-icons/tb'
+import { FaArrowLeft } from 'react-icons/fa'
+import { FaArrowRight } from "react-icons/fa6";
+import { CgMoreVerticalAlt } from "react-icons/cg";
+import { IoCallSharp } from "react-icons/io5";
+import { IoIosArrowDown } from "react-icons/io";
 import { Link } from "react-router-dom"
 import { useState } from "react"
+import { useLocation } from "react-router-dom";
 
-export const Sidebar = () => {
+export const Sidebar = ({ isExpanded, setIsExpanded, sidebarLinks, dropdownLinks }) => {
 
-    const [activeLink, setActiveLink] = useState(0);
-    const handleClick = (index) => {
-        setActiveLink(index)
-    }
-
-    const SIDEBAR_LINKS = [
-        { id: 1, path: "/", name: "Dashboard", icon: LuBox },
-        { id: 2, path: "/member", name: "Members", icon: TbUser },
-        { id: 3, path: "/messages", name: "Messages", icon: LuMessageSquare },
-        { id: 4, path: "/projects", name: "Projects", icon: FaSuitcase },
-        { id: 5, path: "/clients", name: "Clients", icon: LuUser },
-        { id: 6, path: "/works", name: "Works Plan", icon: LuCalendar },
-    ]
+    const [dropdown, setDropdown] = useState(false)
+    const location = useLocation();
 
     return (
-        <div className="w-16 md:w-56 fixed left-0 top-0 z-10 h-screen pt-8 px-4 bg-white">
+        <div className={`h-screen fixed left-0 top-0 transition-all ${isExpanded ? "w-60" : "w-16"}`}>
+            <div className="h-full flex flex-col bg-white shadow-sm">
 
-            {/* Logo */}
+                {/* Logo */}
 
-            <div className="mb-8">
-                <img src="/logo.svg" alt="logo" className="w-15 hidden md:flex" />
-                <img src="/logo-2.svg" alt="logo" className="w-15 flex md:hidden" />
-            </div>
+                <div className="p-4 pb-4 flex justify-between items-center">
+                    <img src="logoipsum-243.svg" alt="logo" className={`overflow-hidden transition-all ${isExpanded ? "w-32" : "w-0"}`} />
+                    <button className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100" onClick={() => setIsExpanded(!isExpanded)}>
+                        {isExpanded ? <FaArrowLeft /> : <FaArrowRight />}
+                    </button>
+                </div>
 
-            {/* Logo */}
+                {/* Logo */}
 
-            {/* Navigation Links */}
+                {/* Navigation Links */}
 
-            <ul className="mt-6 space-y-6">
-                {SIDEBAR_LINKS.map((link, index) => (
-                    <li key={index} className={`font-medium rounded-md py-2 px-5 hover:bg-gray-100 hover:text-indigo-500 ${activeLink === index ? "bg-indigo-100 text-indigo-500" : ""}`}>
-                        <Link to={link.path} className="flex justify-center md:justify-start items-center md:space-x-5" onClick={() => handleClick(index)}>
-                            <span>{link.icon()}</span>
-                            <span className="text-sm text-gray-500 hidden md:flex">{link.name}</span>
-                        </Link>
+                <ul className="flex-1 px-3 pt-4 space-y-6">
+                    {sidebarLinks.map((link, index) => (
+                        <li key={index} className="relative my-1">
+                            <Link to={link.path} className={`flex items-center py-3 px-3 text-xl font-medium rounded-md cursor-pointer transition-colors w-full ${location.pathname === link.path ? "bg-gradient-to-tr from-indigo-200 to-indigo-100 text-indigo-800" : "hover:bg-gray-200 text-gray-600"}`} >
+                                {link.icon()}
+                                <span className={`transition-all text-sm ${isExpanded ? "ml-3 w-auto opacity-100" : "w-0 opacity-0"}`}>
+                                    {link.name}
+                                </span>
+                            </Link>
+                        </li>
+                    ))}
+
+                    <li className="relative my-1">
+                        <div className={`flex items-center justify-between py-3 px-3 text-xl font-medium rounded-md cursor-pointer transition-colors w-full hover:bg-gray-200 text-gray-600`} onClick={() => setDropdown(!dropdown)}>
+                            <div className="flex items-center">
+                                <IoCallSharp />
+                                <span className={`transition-all text-sm ${isExpanded ? "ml-3 w-auto opacity-100" : "w-0 opacity-0"}`}>
+                                    Calls
+                                </span>
+                            </div>
+                            {isExpanded && (
+                                <div>
+                                    <IoIosArrowDown size={18} />
+                                </div>
+                            )}
+                        </div>
+
+                        {isExpanded && (
+
+                            <ul className={`overflow-hidden transition-all duration-300 space-y-6 ml-3 ${dropdown ? "max-h-[200px] opacity-100 pt-4" : "max-h-0 opacity-0 pt-0"}`}>
+                                {dropdownLinks.map((link, index) => (
+                                    <li key={index} className="relative my-1">
+                                        <Link to={link.path} className={`flex items-center py-2 px-3 font-medium rounded-md cursor-pointer transition-colors w-full ${location.pathname === link.path ? "bg-gradient-to-tr from-indigo-200 to-indigo-100 text-indigo-800" : "hover:bg-gray-200 text-gray-600"}`}>
+                                            {link.icon()}
+                                            <span className={`text-sm ml-3 w-auto opacity-100`}>
+                                                {link.name}
+                                            </span>
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+
                     </li>
-                ))}
-            </ul>
 
-            {/* Navigation Links */}
+                </ul>
 
-            <div className="w-full absolute bottom-5 left-0 px-4 py-2 cursor-pointer text-center">
-                <p className="flex items-center space-x-2 text-xs text-white py-2 px-5 bg-gradient-to-r from-indigo-500 to-violet-600 rounded-full">
-                    {""}
-                    <span>?</span><span className="hidden md:flex">Need Help</span>
-                </p>
+                {/* Navigation Links */}
+
+                {/* User info */}
+
+                <div className="border-t flex p-3">
+                    <img src="https://randomuser.me/api/portraits/men/20.jpg" alt="" className="w-10 h-10 rounded-md" />
+                    <div className={`flex justify-between items-center overflow-hidden transition-all ${isExpanded ? "w-52 ml-3" : "w-0"}`}>
+                        <div className="leading-4">
+                            <h3 className="text-sm semi-bold">Abdul Basit</h3>
+                            <span className="text-xs text-gray-600">abc@example.com</span>
+                        </div>
+                        <div className="cursor-pointer">
+                            <CgMoreVerticalAlt size={20} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* User info */}
+
             </div>
-
-        </div>
+        </div >
     )
 }
